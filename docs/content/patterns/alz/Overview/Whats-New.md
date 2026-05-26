@@ -47,6 +47,7 @@ To see what we have been and are working on, refer to the [AMBA Public Roadmap](
 ### Documentation Updates
 
 - Several _**Deploy to Azure**_ buttons have been fixed to work properly.
+- A least-privilege set of roles that can be used in place of `Owner` has been added to the [Prerequisites](../HowTo/deploy/Introduction-to-deploying-the-ALZ-Pattern#prerequisites) section in the [Introduction to deploying the AMBA-ALZ Pattern](../HowTo/deploy/Introduction-to-deploying-the-ALZ-Pattern) page.
 
 ### Tools
 
