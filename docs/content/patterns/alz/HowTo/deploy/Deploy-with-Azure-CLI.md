@@ -5,11 +5,11 @@ weight: 40
 
 ### In this page
 
-> [Parameter Configuration](../Deploy-with-Azure-CLI#1-parameter-configuration) </br>
-> [Sample Parameter File](../Deploy-with-Azure-CLI#2-sample-parameter-file) </br>
-> [Configuring Variables for Deployment](../Deploy-with-Azure-CLI#3-configuring-variables-for-deployment) </br>
-> [Deploying AMBA-ALZ](../Deploy-with-Azure-CLI#4-deploying-amba-alz) </br>
-> [Next Steps](../Deploy-with-Azure-CLI#next-steps) </br>
+> [Parameter Configuration](#1-parameter-configuration) </br>
+> [Sample Parameter File](#2-sample-parameter-file) </br>
+> [Configuring Variables for Deployment](#3-configuring-variables-for-deployment) </br>
+> [Deploying AMBA-ALZ](#4-deploying-amba-alz) </br>
+> [Next Steps](#next-steps) </br>
 
 </br>
 

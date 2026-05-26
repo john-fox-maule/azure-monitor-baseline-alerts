@@ -8,7 +8,7 @@ weight: 50
 > [Parameter Configuration](#1-parameter-configuration) </br>
 > [Sample Parameter File](#2-sample-parameter-file) </br>
 > [Configuring Variables for Deployment](#3-configuring-variables-for-deployment) </br>
-> [Deploy Policy Definitions, Initiatives, and Policy Assignments with Default Settings](#4-deploy-policy-definitions-initiatives-and-policy-assignments-with-default-settings) </br>
+> [Deploying AMBA-ALZ](#4-deploying-amba-alz) </br>
 > [Next Steps](#next-steps) </br>
 
 </br>
@@ -104,7 +104,7 @@ $pseudoRootManagementGroup = "The pseudo root management group ID parenting the 
 
 {{< /tabs >}}
 
-## 4. Deploy Policy Definitions, Initiatives, and Policy Assignments with Default Settings
+## 4. Deploying AMBA-ALZ
 
 {{< tabs groupid="Deploy_PSH_Deploy" >}}
 
