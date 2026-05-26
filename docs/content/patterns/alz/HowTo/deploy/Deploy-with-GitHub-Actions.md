@@ -5,9 +5,10 @@ weight: 70
 
 ### In this page
 
-> [Parameter Configuration](#1-parameter-configuration) </br>
-> [Sample Parameter File](#2-sample-parameter-file) </br>
-> [Configure and Run the Workflow](#3-configure-and-run-the-workflow) </br>
+> [Prerequisites](#prerequisites) </br>
+> [Sample Parameter File](#sample-parameter-file) </br>
+> [Parameter Configuration](#parameter-configuration) </br>
+> [Configure and Run the Workflow](#configure-and-run-the-workflow) </br>
 > [Next Steps](#next-steps) </br>
 
 </br>
@@ -15,25 +16,11 @@ weight: 70
 > [!warning]
 > Updating from the _**preview**_ version is not supported. If you deployed the _**preview**_ version, please follow the steps in [Transitioning from Preview to General Availability (GA)](../../../HowTo/UpdateToNewReleases/Moving-from-preview-to-GA) before proceeding.
 
-## 1. Parameter Configuration
+## Prerequisites
 
-{{< tabs groupid="Deploy_GHA_Param1" >}}
+Deploying AMBA-ALZ requires some prerequisites and configuration to be completed upfront for both _**Management Group (hierarchy or single)**_ and _**Cloud Solution Provider (CSP) or Azure Lighthouse**_. Ensure all the necessary prerequisites, listed for the respective section in the [Prerequisites](./Introduction-to-deploying-the-ALZ-Pattern#prerequisites) page are in place.
 
-{{% tab title="Management Group (hierarchy or single)" %}}
-
-{{% include "parameterConfiguration_1" %}}
-
-{{% /tab %}}
-
-{{% tab title="Cloud Solution Provider (CSP) or Azure Lighthouse" %}}
-
-{{% include "parameterConfiguration_Subs_1" %}}
-
-{{% /tab %}}
-
-{{< /tabs >}}
-
-## 2. Sample Parameter File
+## Sample Parameter File
 
 {{< tabs groupid="Deploy_GHA_Param2" >}}
 
@@ -51,7 +38,25 @@ weight: 70
 
 {{< /tabs >}}
 
-## 3. Configure and Run the Workflow
+## Parameter Configuration
+
+{{< tabs groupid="Deploy_GHA_Param1" >}}
+
+{{% tab title="Management Group (hierarchy or single)" %}}
+
+{{% include "parameterConfiguration_1" %}}
+
+{{% /tab %}}
+
+{{% tab title="Cloud Solution Provider (CSP) or Azure Lighthouse" %}}
+
+{{% include "parameterConfiguration_Subs_1" %}}
+
+{{% /tab %}}
+
+{{< /tabs >}}
+
+## Configure and Run the Workflow
 
 {{< tabs groupid="Deploy_GHA_Variables" >}}
 

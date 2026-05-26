@@ -82,11 +82,18 @@ To download the cleanup script file, follow these steps. Alternatively, you can 
 3. Navigate to the directory containing the **Start-ALZ-Maintenance.ps1** script.
 4. Set the _**$pseudoRootManagementGroup**_ variable using the following command:
 
-  ```powershell
-  $pseudoRootManagementGroup = "The pseudo root management group ID parenting the identity, management and connectivity management groups"
-  ```
+    ```powershell
+    $pseudoRootManagementGroup = "The pseudo root management group ID parenting the identity, management and connectivity management groups"
+    ```
 
-5. Sign in to your Azure account using the `Connect-AzAccount` command. Ensure that the account has the necessary permissions to remove Policy Assignments, Policy Definitions, and resources at the required Management Group scope.
+5. Sign in to your Azure account using the `Connect-AzAccount` command. Ensure that the account has the necessary permissions at the the pseudo root management group level to remove Policy Assignments, Policy Definitions, and resources at the required Management Group scope. The least-privilege roles required for the user or security principal executing the maintenance script include:
+
+   - Managed Identity Contributor
+   - Monitoring Policy Contributor
+   - User Access Administrator (with condition to assign all user roles except admin roles Owner, UAA, RBAC)
+
+    </br>
+
 6. Run the script with one of the following options:
 
     {{% include "PowerShell-ExecutionPolicy" %}}
@@ -142,11 +149,20 @@ To download the cleanup script file, follow these steps. Alternatively, you can 
 3. Navigate to the directory containing the **Start-ALZ-Maintenance.ps1** script.
 4. Set the _**$targetSubscription**_ variable using the following command:
 
-  ```powershell
-  $targetSubscription="The subscription ID where to deploy AMBA-ALZ"
-  ```
+    ```powershell
+    $targetSubscription="The subscription ID where to deploy AMBA-ALZ"
+    ```
 
-5. Sign in to your Azure account using the `Connect-AzAccount` command. Ensure that the account has the necessary permissions to remove Policy Assignments, Policy Definitions, and resources at the required Management Group scope.
+    </br>
+
+5. Sign in to your Azure account using the `Connect-AzAccount` command. Ensure that the account has the necessary permissions at the subscription level to remove Policy Assignments, Policy Definitions, and resources at the required Management Group scope. The least-privilege roles required for the user or security principal executing the maintenance script include:
+
+   - Managed Identity Contributor
+   - Monitoring Policy Contributor
+   - User Access Administrator (with condition to assign all user roles except admin roles Owner, UAA, RBAC)
+
+    </br>
+
 6. Run the script with one of the following options:
 
     {{% include "PowerShell-ExecutionPolicy" %}}

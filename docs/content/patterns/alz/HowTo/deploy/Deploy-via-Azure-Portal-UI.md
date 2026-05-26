@@ -5,11 +5,16 @@ weight: 30
 
 ### In this page
 
+> [Prerequisites](#prerequisites) </br>
 > [Access the AMBA-ALZ Portal Accelerator](#access-the-amba-alz-portal-accelerator) </br>
 > [Deployment Settings Blade](#deployment-settings-blade) </br>
 > [Management Groups / Subscription Settings Blade](#management-groups--subscription-settings-blade) </br>
 > [Notification Settings Blade](#notification-settings-blade) </br>
 > [Next Steps](#next-steps) </br>
+
+## Prerequisites
+
+Deploying AMA-ALZ requires some prerequisites and configuration to be completed upfront for both _**Management Group (hierarchy or single)**_ and _**Cloud Solution Provider (CSP) or Azure Lighthouse**_. Ensure all the necessary prerequisites, listed for the respective section in the [Prerequisites](./Introduction-to-deploying-the-ALZ-Pattern#prerequisites) page are in place.
 
 ## Access the AMBA-ALZ Portal Accelerator
 

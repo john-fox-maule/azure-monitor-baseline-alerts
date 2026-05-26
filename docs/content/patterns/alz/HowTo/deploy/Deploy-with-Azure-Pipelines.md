@@ -5,9 +5,10 @@ weight: 60
 
 ### In this page
 
-> [Parameter Configuration](#1-parameter-configuration) </br>
-> [Sample Parameter File](#2-sample-parameter-file) </br>
-> [Configure and Run the Pipeline](#3-configure-and-run-the-pipeline) </br>
+> [Prerequisites](#prerequisites) </br>
+> [Sample Parameter File](#sample-parameter-file) </br>
+> [Parameter Configuration](#parameter-configuration) </br>
+> [Configure and Run the Pipeline](#configure-and-run-the-pipeline) </br>
 > [Next Steps](#next-steps) </br>
 
 </br>
@@ -15,7 +16,11 @@ weight: 60
 > [!warning]
 > Updating from the _**preview**_ version is not supported. If you deployed the _**preview**_ version, please follow the steps in [Transitioning from Preview to General Availability (GA)](../../../HowTo/UpdateToNewReleases/Moving-from-preview-to-GA) before proceeding.
 
-## 1. Parameter Configuration
+## Prerequisites
+
+Deploying AMBA-ALZ requires some prerequisites and configuration to be completed upfront for both _**Management Group (hierarchy or single)**_ and _**Cloud Solution Provider (CSP) or Azure Lighthouse**_. Ensure all the necessary prerequisites, listed for the respective section in the [Prerequisites](./Introduction-to-deploying-the-ALZ-Pattern#prerequisites) page are in place.
+
+## Parameter Configuration
 
 {{< tabs groupid="Deploy_AZP_Param1" >}}
 
@@ -33,7 +38,7 @@ weight: 60
 
 {{< /tabs >}}
 
-## 2. Sample Parameter File
+## Sample Parameter File
 
 {{< tabs groupid="Deploy_AZP_Param2" >}}
 
@@ -51,7 +56,7 @@ weight: 60
 
 {{< /tabs >}}
 
-## 3. Configure and Run the Pipeline
+## Configure and Run the Pipeline
 
 {{< tabs groupid="Deploy_PSH_Variables" >}}
 

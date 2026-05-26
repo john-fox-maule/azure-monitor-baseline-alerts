@@ -12,6 +12,7 @@ weight: 80
 ### In this page
 
 > [Overview](#overview) </br>
+> [Prerequisites](#prerequisites) </br>
 > [Quick deployment](#quick-deployment) </br>
 > [Custom deployment](#custom-deployment) </br>
 > [Next Steps](#next-steps) </br>
@@ -31,9 +32,227 @@ This guide describes the steps to use the AMBA-ALZ pattern to implement Service 
 > [!note]
 > In this example we will deploy the Service Health Policy Set Definition via Azure CLI. However, the same principles and steps apply to other Policy Set Definitions and deployment methods as well.
 
+## Prerequisites
+
+Deploying AMBA-ALZ requires some prerequisites and configuration to be completed upfront for both _**Management Group (hierarchy or single)**_ and _**Cloud Solution Provider (CSP) or Azure Lighthouse**_. Ensure all the necessary prerequisites, listed for the respective section in the [Prerequisites](./Introduction-to-deploying-the-ALZ-Pattern#prerequisites) page are in place.
+
 ## Quick deployment
 
-### 1. Parameter configuration
+### Sample Parameter file
+
+{{< tabs groupid="Deploy_SH_Param2" >}}
+
+{{% tab title="Management Group (hierarchy or single)" %}}
+
+The parameter file shown below has been truncated for brevity, compared to the samples included.
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "enterpriseScaleCompanyPrefix": {
+      "value": "contoso"
+    },
+    "enableAMBAConnectivity": {
+      "value": "No"
+    },
+    "enableAMBAIdentity": {
+      "value": "No"
+    },
+    "enableAMBAManagement": {
+      "value": "No"
+    },
+    "enableAMBAServiceHealth": {
+      "value": "Yes"
+    },
+    "enableAMBANotificationAssets": {
+      "value": "No"
+    },
+    "enableAMBAHybridVM": {
+      "value": "No"
+    },
+    "enableAMBAKeyManagement": {
+      "value": "No"
+    },
+    "enableAMBALoadBalancing": {
+      "value": "No"
+    },
+    "enableAMBANetworkChanges": {
+      "value": "No"
+    },
+    "enableAMBARecoveryServices": {
+      "value": "No"
+    },
+    "enableAMBAStorage": {
+      "value": "No"
+    },
+    "enableAMBAVM": {
+      "value": "No"
+    },
+    "enableAMBAWeb": {
+      "value": "No"
+    },
+    "telemetryOptOut": {
+      "value": "No"
+    },
+    "bringYourOwnUserAssignedManagedIdentity": {
+      "value": "No"
+    },
+    "bringYourOwnUserAssignedManagedIdentityResourceId": {
+      "value": ""
+    },
+    "userAssignedManagedIdentityName": {
+      "value": "id-amba-prod-001"
+    },
+    "managementSubscriptionId": {
+      "value": ""
+    },
+    "ALZMonitorResourceGroupName": {
+      "value": "rg-amba-monitoring-001"
+    },
+    "ALZMonitorResourceGroupLocation": {
+      "value": "eastus"
+    },
+    "ALZMonitorResourceGroupTags": {
+      "value": {
+        "Project": "amba-monitoring"
+      }
+    },
+    "ALZMonitorDisableTagName": {
+      "value": "MonitorDisable"
+    },
+    "ALZMonitorDisableTagValues": {
+      "value": [
+        "true",
+        "Test",
+        "Dev",
+        "Sandbox"
+      ]
+    },
+    .
+    .
+    .
+    .
+  }
+}
+```
+
+{{% /tab %}}
+
+{{% tab title="Cloud Solution Provider (CSP) or Azure Lighthouse" %}}
+
+The parameter file shown below has been truncated for brevity, compared to the samples included.
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "topLevelSubscriptionId": {
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    "platformManagementGroup": {
+      "value": "contoso-platform"
+    },
+    "IdentityManagementGroup": {
+      "value": "contoso-identity"
+    },
+    "managementManagementGroup": {
+      "value": "contoso-management"
+    },
+    "connectivityManagementGroup": {
+      "value": "contoso-connectivity"
+    },
+    "LandingZoneManagementGroup": {
+      "value": "contoso-landingzones"
+    },
+    "enableAMBAConnectivity": {
+      "value": "No"
+    },
+    "enableAMBAIdentity": {
+      "value": "No"
+    },
+    "enableAMBAManagement": {
+      "value": "No"
+    },
+    "enableAMBAServiceHealth": {
+      "value": "Yes"
+    },
+    "enableAMBANotificationAssets": {
+      "value": "No"
+    },
+    "enableAMBAHybridVM": {
+      "value": "No"
+    },
+    "enableAMBAKeyManagement": {
+      "value": "No"
+    },
+    "enableAMBALoadBalancing": {
+      "value": "No"
+    },
+    "enableAMBANetworkChanges": {
+      "value": "No"
+    },
+    "enableAMBARecoveryServices": {
+      "value": "No"
+    },
+    "enableAMBAStorage": {
+      "value": "No"
+    },
+    "enableAMBAVM": {
+      "value": "No"
+    },
+    "enableAMBAWeb": {
+      "value": "No"
+    },
+    "telemetryOptOut": {
+      "value": "No"
+    },
+    "bringYourOwnUserAssignedManagedIdentity": {
+      "value": "No"
+    },
+    "bringYourOwnUserAssignedManagedIdentityResourceId": {
+      "value": ""
+    },
+    "userAssignedManagedIdentityName": {
+      "value": "id-amba-prod-001"
+    },
+    "ALZMonitorResourceGroupName": {
+      "value": "rg-amba-monitoring-001"
+    },
+    "ALZMonitorResourceGroupLocation": {
+      "value": "eastus"
+    },
+    "ALZMonitorResourceGroupTags": {
+      "value": {
+        "Project": "amba-monitoring"
+      }
+    },
+    "ALZMonitorDisableTagName": {
+      "value": "MonitorDisable"
+    },
+    "ALZMonitorDisableTagValues": {
+      "value": [
+        "true",
+        "Test",
+        "Dev",
+        "Sandbox"
+      ]
+    },
+    .
+    .
+    .
+    .
+  }
+}
+```
+
+{{% /tab %}}
+
+{{< /tabs >}}
+
+### Parameter configuration
 
 {{< tabs groupid="Deploy_SH_Param1" >}}
 
@@ -309,221 +528,7 @@ Change the value of the following parameters at the beginning of the parameter f
 
 {{< /tabs >}}
 
-### 2. Example Parameter file
-
-{{< tabs groupid="Deploy_SH_Param2" >}}
-
-{{% tab title="Management Group (hierarchy or single)" %}}
-
-The parameter file shown below has been truncated for brevity, compared to the samples included.
-
-```json
-{
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "enterpriseScaleCompanyPrefix": {
-      "value": "contoso"
-    },
-    "enableAMBAConnectivity": {
-      "value": "No"
-    },
-    "enableAMBAIdentity": {
-      "value": "No"
-    },
-    "enableAMBAManagement": {
-      "value": "No"
-    },
-    "enableAMBAServiceHealth": {
-      "value": "Yes"
-    },
-    "enableAMBANotificationAssets": {
-      "value": "No"
-    },
-    "enableAMBAHybridVM": {
-      "value": "No"
-    },
-    "enableAMBAKeyManagement": {
-      "value": "No"
-    },
-    "enableAMBALoadBalancing": {
-      "value": "No"
-    },
-    "enableAMBANetworkChanges": {
-      "value": "No"
-    },
-    "enableAMBARecoveryServices": {
-      "value": "No"
-    },
-    "enableAMBAStorage": {
-      "value": "No"
-    },
-    "enableAMBAVM": {
-      "value": "No"
-    },
-    "enableAMBAWeb": {
-      "value": "No"
-    },
-    "telemetryOptOut": {
-      "value": "No"
-    },
-    "bringYourOwnUserAssignedManagedIdentity": {
-      "value": "No"
-    },
-    "bringYourOwnUserAssignedManagedIdentityResourceId": {
-      "value": ""
-    },
-    "userAssignedManagedIdentityName": {
-      "value": "id-amba-prod-001"
-    },
-    "managementSubscriptionId": {
-      "value": ""
-    },
-    "ALZMonitorResourceGroupName": {
-      "value": "rg-amba-monitoring-001"
-    },
-    "ALZMonitorResourceGroupLocation": {
-      "value": "eastus"
-    },
-    "ALZMonitorResourceGroupTags": {
-      "value": {
-        "Project": "amba-monitoring"
-      }
-    },
-    "ALZMonitorDisableTagName": {
-      "value": "MonitorDisable"
-    },
-    "ALZMonitorDisableTagValues": {
-      "value": [
-        "true",
-        "Test",
-        "Dev",
-        "Sandbox"
-      ]
-    },
-    .
-    .
-    .
-    .
-  }
-}
-```
-
-{{% /tab %}}
-
-{{% tab title="Cloud Solution Provider (CSP) or Azure Lighthouse" %}}
-
-The parameter file shown below has been truncated for brevity, compared to the samples included.
-
-```json
-{
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "topLevelSubscriptionId": {
-      "value": "00000000-0000-0000-0000-000000000000"
-    },
-    "platformManagementGroup": {
-      "value": "contoso-platform"
-    },
-    "IdentityManagementGroup": {
-      "value": "contoso-identity"
-    },
-    "managementManagementGroup": {
-      "value": "contoso-management"
-    },
-    "connectivityManagementGroup": {
-      "value": "contoso-connectivity"
-    },
-    "LandingZoneManagementGroup": {
-      "value": "contoso-landingzones"
-    },
-    "enableAMBAConnectivity": {
-      "value": "No"
-    },
-    "enableAMBAIdentity": {
-      "value": "No"
-    },
-    "enableAMBAManagement": {
-      "value": "No"
-    },
-    "enableAMBAServiceHealth": {
-      "value": "Yes"
-    },
-    "enableAMBANotificationAssets": {
-      "value": "No"
-    },
-    "enableAMBAHybridVM": {
-      "value": "No"
-    },
-    "enableAMBAKeyManagement": {
-      "value": "No"
-    },
-    "enableAMBALoadBalancing": {
-      "value": "No"
-    },
-    "enableAMBANetworkChanges": {
-      "value": "No"
-    },
-    "enableAMBARecoveryServices": {
-      "value": "No"
-    },
-    "enableAMBAStorage": {
-      "value": "No"
-    },
-    "enableAMBAVM": {
-      "value": "No"
-    },
-    "enableAMBAWeb": {
-      "value": "No"
-    },
-    "telemetryOptOut": {
-      "value": "No"
-    },
-    "bringYourOwnUserAssignedManagedIdentity": {
-      "value": "No"
-    },
-    "bringYourOwnUserAssignedManagedIdentityResourceId": {
-      "value": ""
-    },
-    "userAssignedManagedIdentityName": {
-      "value": "id-amba-prod-001"
-    },
-    "ALZMonitorResourceGroupName": {
-      "value": "rg-amba-monitoring-001"
-    },
-    "ALZMonitorResourceGroupLocation": {
-      "value": "eastus"
-    },
-    "ALZMonitorResourceGroupTags": {
-      "value": {
-        "Project": "amba-monitoring"
-      }
-    },
-    "ALZMonitorDisableTagName": {
-      "value": "MonitorDisable"
-    },
-    "ALZMonitorDisableTagValues": {
-      "value": [
-        "true",
-        "Test",
-        "Dev",
-        "Sandbox"
-      ]
-    },
-    .
-    .
-    .
-    .
-  }
-}
-```
-
-{{% /tab %}}
-
-{{< /tabs >}}
-
-### 3. Configuring variables for deployment
+### Configuring variables for deployment
 
 {{< tabs groupid="Deploy_SH_VAriables" >}}
 
@@ -569,7 +574,7 @@ targetSubscription="The pseudo root management group ID parenting the Platform a
 
 {{< /tabs >}}
 
-### 4. Deploying AMBA-ALZ
+### Deploying AMBA-ALZ
 
 {{< tabs groupid="Deploy_SH_Deploy" >}}
 
