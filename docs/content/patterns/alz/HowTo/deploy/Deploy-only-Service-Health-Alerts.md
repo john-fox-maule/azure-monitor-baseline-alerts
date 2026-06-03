@@ -12,6 +12,7 @@ weight: 80
 ### In this page
 
 > [Overview](#overview) </br>
+> [Prerequisites](#prerequisites) </br>
 > [Quick deployment](#quick-deployment) </br>
 > [Custom deployment](#custom-deployment) </br>
 > [Next Steps](#next-steps) </br>
@@ -31,285 +32,13 @@ This guide describes the steps to use the AMBA-ALZ pattern to implement Service 
 > [!note]
 > In this example we will deploy the Service Health Policy Set Definition via Azure CLI. However, the same principles and steps apply to other Policy Set Definitions and deployment methods as well.
 
+## Prerequisites
+
+Deploying AMBA-ALZ requires some prerequisites and configuration to be completed upfront for both _**Management Group (hierarchy or single)**_ and _**Cloud Solution Provider (CSP) or Azure Lighthouse**_. Ensure all the necessary prerequisites, listed for the respective section in the [Prerequisites](./Introduction-to-deploying-the-ALZ-Pattern#prerequisites) page are in place.
+
 ## Quick deployment
 
-### 1. Parameter configuration
-
-{{< tabs groupid="Deploy_SH_Param1" >}}
-
-{{% tab title="Management Group (hierarchy or single)" %}}
-
-To begin, download the appropriate parameter file for the version of AMBA-ALZ you are deploying.
-
-  > [!note]
-  > Forking or cloning the repository isn’t required for the deployment, unless you have customized the policies as described in [How to modify individual policies](../Introduction-to-deploying-the-ALZ-Pattern#how-to-modify-individual-policies)
-
-- [alzArm.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/2026-03-06/patterns/alz/alzArm.param.json) aligned to the latest release
-- [alzArm.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/main/patterns/alz/alzArm.param.json) aligned to the main branch
-
-The following changes apply to all scenarios, whether you are aligned or unaligned with ALZ or have a single management group.
-
-- Change the value of the following parameters at the beginning of the parameter file according to the instructions below:
-
-  > [!note]
-  > While it's technically possible to not add any notification information (no email, no ARM Role, no Logic App, etc.) it is recommended to configure at least one option.
-
-  - Change the value of *```enterpriseScaleCompanyPrefix```* to the management group where you wish to deploy the policies and the initiatives. This is usually the so called "pseudo root management group", for example, in [ALZ terminology](https://learn.microsoft.com/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org-management-groups), this would be the so called "Intermediate Root Management Group" (directly beneath the "Tenant Root Group").
-  - Change the value of *```bringYourownUserAssignedManagedIdentity```* to **Yes** if you have an existing user assigned managed identity with the ***Monitoring Reader*** role assigned at the pseudo root management group level or leave it to **No** if you would like to create a new one with the proper rights as part of the deployment process.
-  - Change the value of *```bringYourownUserAssignedManagedIdentityResourceId```*. If you set the *```bringYourownUserAssignedManagedIdentity```* parameter to **Yes**, insert the resource ID of your user assigned managed identity. If you left it with the default value of **No**, leave the value blank.
-  - Change the value of *```userAssignedManagedIdentityName```* to a name of your preference. This parameter is used only if the *```bringYourownUserAssignedManagedIdentity```* has been set to **No**.
-  - Change the value of *```managementSubscriptionId```*. If you set the *```bringYourownUserAssignedManagedIdentity```* parameter to **No**, enter the subscriptionId of the management subscription, otherwise leave the default value.
-  - Change the value of *```ALZMonitorResourceGroupName```* to the name of the resource group where the activity logs, resource health alerts, actions groups and alert processing rules will be deployed in.
-  - Change the value of *```ALZMonitorResourceGroupTags```* to specify the tags to be added to said resource group.
-  - Change the value of *```ALZMonitorResourceGroupLocation```* to specify the location for said resource group.
-  - Update the *```ALZMonitorActionGroupEmail```* parameter with the email address(es) for alert notifications (including Service Health alerts). Leave it blank if no email notification is required or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)).
-  - Set the *```ALZLogicappResourceId```* parameter to the Logic App resource ID to be used for alert actions (including Service Health alerts). Leave it blank if no Logic App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Logic App resource ID, navigate to the resource, in the ***Overview*** panel click on ***JSON View*** and copy the value of the Resource ID field.
-
-    ![Logic App JSON View](../../../media/LogicApp_ResourceID_1.png)
-
-    ![Logic App Resource ID](../../../media/LogicApp_ResourceID_2.png)
-
-  - Update the *```ALZLogicappCallbackUrl```* parameter with the callback URL of the Logic App to be used for alert actions (including Service Health alerts). Leave it blank if no Logic App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the callback URL, use the [***Get-AzLogicAppTriggerCallbackUrl***](https://learn.microsoft.com/en-us/powershell/module/az.logicapp/get-azlogicapptriggercallbackurl) PowerShell command or navigate to the Logic App in the Azure portal, go to ***Logic App Designer***, expand the trigger activity (*When an HTTP request is received*), and copy the URL using the copy icon.
-
-    ![Get Logic app callback url](../../../media/AMBA-LogicAppCallbackUrl.png)
-
-  - Update the value of `_ALZArmRoleId_` to specify the Azure Resource Manager Role name(s) that should receive notifications for the alerts, including Service Health alerts. If no notifications are required for any Azure Resource Manager Role, or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)) leave this value blank.
-
-    Azure only supports the following ***built-in*** roles for Azure Resource Manager Role notification:
-
-    | Role Name | Role GUID |
-    | --------- | --------- |
-    | Owner | 8e3af657-a8ff-443c-a75c-2fe8c4bcb635 |
-    | Contributor | b24988ac-6180-42a0-ab88-20f7382dd24c |
-    | Reader | acdd72a7-3385-48ef-bd42-f606fba81ae7 |
-    | Monitoring Contributor | 749f88d5-cbae-40b8-bcfc-e573ddc772fa |
-    | Monitoring Reader | 43d0d8ad-25c7-4714-9337-8ba259a9fe05 |
-
-  - Update the value of *```ALZEventHubResourceId```* to specify the Event Hubs that will be used for alert actions, including Service Health alerts. Leave it blank if no Event Hubs is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Event Hubs resource ID, navigate to the resource, in the search box type ***Event Hubs***, click ***Event Hubs***, select the event hub of your interest and in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
-
-    ![Event Hub Namespace ](../../../media/EventHub_ResourceID_1.png)
-
-    ![Event Hub JSON View](../../../media/EventHub_ResourceID_2.png)
-
-    ![Event Hub Resource ID](../../../media/EventHub_ResourceID_3.png)
-
-  - Update the *```ALZWebhookServiceUri```* parameter with the URI(s) of the Webhooks to be used for alert actions, including Service Health alerts. Leave it blank if no Webhooks are used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)).
-  - Update the *```ALZFunctionResourceId```* parameter with the resource ID of the Function App to be used for alert actions, including Service Health alerts. Leave it blank if no Function App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Function App resource ID, navigate to the resource, in the ***Overview*** panel click on ***JSON View*** and copy the value of the Resource ID field.
-
-    ![Function App JSON View](../../../media/FunctionApp_ResourceID_1.png)
-
-    ![Funtion App Resource ID](../../../media/FunctionApp_ResourceID_2.png)
-
-  - Update the *```ALZFunctionTriggerUrl```* parameter with the trigger URL of the Function App to be used for alert actions, including Service Health alerts. Leave it blank if no Function App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Function App trigger URL with the corresponding code, navigate to the HTTP-triggered functions in the Azure portal, go to ***Code + Test***, select **Get function URL** from the top menu, and copy the value in the URL field using the copy icon.
-
-    ![Get function URL](../../../media/AMBA-FunctionAppTriggerUrl.png)
-
-  - Update the *```ALZAlertSeverity```* parameter with the different severity level to be used for alert actions, including Service Health alerts. Leave the default values to notify on every severity level.
-
-    > [!note]
-    > Activity Log alerts can only be configured with ***Sev4*** which translates to ***Verbose***. No other severities are allowed. Consider this when changing the default value of the ALZAlertSeverity parameter.
-
-  - Update the *```BYOActionGroup```* parameter with resource ID of your selected action group to be used for alert actions, including Service Health alerts. Leave it blank to use AMBA-ALZ created action groups. To retrieve the Action Group resource ID, navigate to the ***Monitor*** page, click on ***Action groups***, click on the identified action group, in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
-
-    ![Action groups](../../../media/ActionGroup_ResourceID_1.png)
-
-    ![Selected action group](../../../media/ActionGroup_ResourceID_2.png)
-
-    ![Action Group JSON View ID](../../../media/ActionGroup_ResourceID_3.png)
-
-    ![Action Group Resource ID](../../../media/ActionGroup_ResourceID_4.png)
-
-  - Update the *```BYOAlertProcessingRule```* parameter with the trigger URL of the Function App to be used for alert actions, including Service Health alerts. Leave it blank to use AMBA-ALZ created alert processing rules. To retrieve the Alert Processing Rule resource ID, navigate to the ***Monitor*** page, click on ***Alert Processing Rule***, click on the identified action group, in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
-
-    ![Alert Processing Rules](../../../media/AlertProcessingRule_ResourceID_1.png)
-
-    ![Selected alert processing rule](../../../media/AlertProcessingRule_ResourceID_2.png)
-
-    ![Alert Processing Rule JSON View ID](../../../media/AlertProcessingRule_ResourceID_3.png)
-
-    ![Alert Processing Rule Resource ID](../../../media/AlertProcessingRule_ResourceID_4.png)
-
-    > [!note]
-    > It is possible use multiple email addresses, as well as multiple Arm Roles, Webhooks or Event Hubs (not recommended as per  ALZ guidance). Should you set multiple entries, make sure they are entered as single string with values separated by comma.  Example:
-    >
-    > ```json
-    > "ALZMonitorActionGroupEmail": {
-    >     "value": [
-    >          "action1@contoso.com",
-    >          "action2@contoso.com"
-    >      ]
-    > },
-    >
-    > "ALZArmRoleId": {
-    >      "value": [
-    >          "Owner",
-    >          "Contributor"
-    >      ]
-    > },
-    > "ALZWebhookServiceUri": {
-    >      "value": [
-    >          "https://webookURI1.webook.com",
-    >          "http://webookURI2.webook.com"
-    >      ]
-    > }
-    > ```
-
-  To disable initiative assignments, set the value of any of the following parameters to **"No"**: *```enableAMBAConnectivity```*, *```enableAMBAIdentity```*, *```enableAMBAManagement```*, *```enableAMBAServiceHealth```*, *```enableAMBANotificationAssets```*, *```enableAMBAHybridVM```*, *```enableAMBAKeyManagement```*, *```enableAMBALoadBalancing```*, *```enableAMBANetworkChanges```*, *```enableAMBARecoveryServices```*, *```enableAMBAStorage```*, *```enableAMBAVM```*, or *```enableAMBAWeb```*.
-
-#### If you are aligned to ALZ
-
-- Change the value of *```platformManagementGroup```* to the management group ID for Platform.
-- Change the value of *```IdentityManagementGroup```* to the management group ID for Identity.
-- Change the value of *```managementManagementGroup```* to the management group ID for Management.
-- Change the value of *```connectivityManagementGroup```* to the management group ID for Connectivity.
-- Change the value of *```LandingZoneManagementGroup```* to the management group ID for Landing Zones.
-
-#### If you are unaligned to ALZ
-
-- Change the value of *```platformManagementGroup```* to the management group ID for Platform. The same management group ID may be repeated.
-- Change the value of *```IdentityManagementGroup```* to the management group ID for Identity. The same management group ID may be repeated.
-- Change the value of *```IdentityManagementGroup```* to the management group ID for Identity. The same management group ID may be repeated.
-- Change the value of *```managementManagementGroup```* to the management group ID for Management. The same management group ID may be repeated.
-- Change the value of *```connectivityManagementGroup```* to the management group ID for Connectivity. The same management group ID may be repeated.
-- Change the value of *```LandingZoneManagementGroup```* to the management group ID for Landing Zones. The same management group ID may be repeated.
-
-> [!note]
-> For ease of deployment and maintenance we have kept the same variables. For example, if you combined Identity, Management and Connectivity into one management group you should configure the variables *```identityManagementGroup```*, *```managementManagementGroup```* , *```connectivityManagementGroup```* and *```LZManagementGroup```* with the same management group id.
-
-#### If you have a single management group
-
-- Change the value of *```platformManagementGroup```* to the pseudo root management group ID, also called the "Intermediate Root Management Group".
-- Change the value of *```IdentityManagementGroup```* to the pseudo root management group ID, also called the "Intermediate Root Management Group".
-- Change the value of *```managementManagementGroup```* to the pseudo root management group ID, also called the "Intermediate Root Management Group".
-- Change the value of *```connectivityManagementGroup```* to the pseudo root management group ID, also called the "Intermediate Root Management Group".
-- Change the value of *```LandingZoneManagementGroup```* to the pseudo root management group ID, also called the "Intermediate Root Management Group".
-
-> [!note]
-> For ease of deployment and maintenance we have kept the same variables. Configure the variables *```enterpriseScaleCompanyPrefix```*, *```platformManagementGroup```*, *```identityManagementGroup```*, *```managementManagementGroup```*, *```connectivityManagementGroup```* and *```LZManagementGroup```* with the pseudo root management group ID.
-
-{{% /tab %}}
-
-{{% tab title="Cloud Solution Provider (CSP) or Azure Lighthouse" %}}
-
-To begin, download the appropriate parameter file for the version of AMBA-ALZ you are deploying.
-
-  > [!note]
-  > Forking or cloning the repository isn’t required for the deployment, unless you have customized the policies as described in [How to modify individual policies](../Introduction-to-deploying-the-ALZ-Pattern#how-to-modify-individual-policies)
-
-- [alzArm4Subs.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/2026-03-06/patterns/alz4Subs/alzArm4Subs.param.json) aligned to the latest release
-- [alzArm4Subs.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/main/patterns/alz4Subs/alzArm4Subs.param.json) aligned to the main branch
-
-Change the value of the following parameters at the beginning of the parameter file according to the instructions below:
-
-> [!note]
-> While it's technically possible to not add any notification information (no email, no ARM Role, no Logic App, etc.) it is recommended to configure at least one option.
-
-- Change the value of *```bringYourownUserAssignedManagedIdentity```* to **Yes** if you have an existing user assigned managed identity with the ***Monitoring Reader*** role assigned at the pseudo root management group level or leave it to **No** if you would like to create a new one with the proper rights as part of the deployment process.
-- Change the value of *```bringYourownUserAssignedManagedIdentityResourceId```*. If you set the *```bringYourownUserAssignedManagedIdentity```* parameter to **Yes**, insert the resource ID of your user assigned managed identity. If you left it with the default value of **No**, leave the value blank.
-- Change the value of *```userAssignedManagedIdentityName```* to a name of your preference. This parameter is used only if the *```bringYourownUserAssignedManagedIdentity```* has been set to **No**.
-- Change the value of *```topLevelSubscriptionId```*to the subscription ID where AMBA-ALZ is being deployed.
-- Change the value of *```ALZMonitorResourceGroupName```* to the name of the resource group where the activity logs, resource health alerts, actions groups and alert processing rules will be deployed in.
-- Change the value of *```ALZMonitorResourceGroupTags```* to specify the tags to be added to said resource group.
-- Change the value of *```ALZMonitorResourceGroupLocation```* to specify the location for said resource group.
-- Update the *```ALZMonitorActionGroupEmail```* parameter with the email address(es) for alert notifications (including Service Health alerts). Leave it blank if no email notification is required or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)).
-- Set the *```ALZLogicappResourceId```* parameter to the Logic App resource ID to be used for alert actions (including Service Health alerts). Leave it blank if no Logic App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Logic App resource ID, navigate to the resource, in the ***Overview*** panel click on ***JSON View*** and copy the value of the Resource ID field.
-
-  ![Logic App JSON View](../../../media/LogicApp_ResourceID_1.png)
-
-  ![Logic App Resource ID](../../../media/LogicApp_ResourceID_2.png)
-
-- Update the *```ALZLogicappCallbackUrl```* parameter with the callback URL of the Logic App to be used for alert actions (including Service Health alerts). Leave it blank if no Logic App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the callback URL, use the [***Get-AzLogicAppTriggerCallbackUrl***](https://learn.microsoft.com/en-us/powershell/module/az.logicapp/get-azlogicapptriggercallbackurl) PowerShell command or navigate to the Logic App in the Azure portal, go to ***Logic App Designer***, expand the trigger activity (*When an HTTP request is received*), and copy the URL using the copy icon.
-
-  ![Get Logic app callback url](../../../media/AMBA-LogicAppCallbackUrl.png)
-
-- Update the value of `_ALZArmRoleId_` to specify the Azure Resource Manager Role name(s) that should receive notifications for the alerts, including Service Health alerts. If no notifications are required for any Azure Resource Manager Role, or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)) leave this value blank.
-
-  Azure only supports the following ***built-in*** roles for Azure Resource Manager Role notification:
-
-  | Role Name | Role GUID |
-  | --------- | --------- |
-  | Owner | 8e3af657-a8ff-443c-a75c-2fe8c4bcb635 |
-  | Contributor | b24988ac-6180-42a0-ab88-20f7382dd24c |
-  | Reader | acdd72a7-3385-48ef-bd42-f606fba81ae7 |
-  | Monitoring Contributor | 749f88d5-cbae-40b8-bcfc-e573ddc772fa |
-  | Monitoring Reader | 43d0d8ad-25c7-4714-9337-8ba259a9fe05 |
-
-- Update the value of *```ALZEventHubResourceId```* to specify the Event Hubs that will be used for alert actions, including Service Health alerts. Leave it blank if no Event Hubs is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Event Hubs resource ID, navigate to the resource, in the search box type ***Event Hubs***, click ***Event Hubs***, select the event hub of your interest and in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
-
-  ![Event Hub Namespace ](../../../media/EventHub_ResourceID_1.png)
-
-  ![Event Hub JSON View](../../../media/EventHub_ResourceID_2.png)
-
-  ![Event Hub Resource ID](../../../media/EventHub_ResourceID_3.png)
-
-- Update the *```ALZWebhookServiceUri```* parameter with the URI(s) of the Webhooks to be used for alert actions, including Service Health alerts. Leave it blank if no Webhooks are used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)).
-- Update the *```ALZFunctionResourceId```* parameter with the resource ID of the Function App to be used for alert actions, including Service Health alerts. Leave it blank if no Function App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Function App resource ID, navigate to the resource, in the ***Overview*** panel click on ***JSON View*** and copy the value of the Resource ID field.
-
-  ![Function App JSON View](../../../media/FunctionApp_ResourceID_1.png)
-
-  ![Funtion App Resource ID](../../../media/FunctionApp_ResourceID_2.png)
-
-- Update the *```ALZFunctionTriggerUrl```* parameter with the trigger URL of the Function App to be used for alert actions, including Service Health alerts. Leave it blank if no Function App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Function App trigger URL with the corresponding code, navigate to the HTTP-triggered functions in the Azure portal, go to ***Code + Test***, select **Get function URL** from the top menu, and copy the value in the URL field using the copy icon.
-
-  ![Get function URL](../../../media/AMBA-FunctionAppTriggerUrl.png)
-
-- Update the *```ALZAlertSeverity```* parameter with the different severity level to be used for alert actions, including Service Health alerts. Leave the default values to notify on every severity level.
-
-  > [!note]
-  > Activity Log alerts can only be configured with ***Sev4*** which translates to ***Verbose***. No other severities are allowed. Consider this when changing the default value of the ALZAlertSeverity parameter.
-
-- Update the *```BYOActionGroup```* parameter with resource ID of your selected action group to be used for alert actions, including Service Health alerts. Leave it blank to use AMBA-ALZ created action groups. To retrieve the Action Group resource ID, navigate to the ***Monitor*** page, click on ***Action groups***, click on the identified action group, in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
-
-  ![Action groups](../../../media/ActionGroup_ResourceID_1.png)
-
-  ![Selected action group](../../../media/ActionGroup_ResourceID_2.png)
-
-  ![Action Group JSON View ID](../../../media/ActionGroup_ResourceID_3.png)
-
-  ![Action Group Resource ID](../../../media/ActionGroup_ResourceID_4.png)
-
-- Update the *```BYOAlertProcessingRule```* parameter with the trigger URL of the Function App to be used for alert actions, including Service Health alerts. Leave it blank to use AMBA-ALZ created alert processing rules. To retrieve the Alert Processing Rule resource ID, navigate to the ***Monitor*** page, click on ***Alert Processing Rule***, click on the identified action group, in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
-
-  ![Alert Processing Rules](../../../media/AlertProcessingRule_ResourceID_1.png)
-
-  ![Selected alert processing rule](../../../media/AlertProcessingRule_ResourceID_2.png)
-
-  ![Alert Processing Rule JSON View ID](../../../media/AlertProcessingRule_ResourceID_3.png)
-
-  ![Alert Processing Rule Resource ID](../../../media/AlertProcessingRule_ResourceID_4.png)
-
-    > [!note]
-    > It is possible use multiple email addresses, as well as multiple Arm Roles, Webhooks or Event Hubs (not recommended as per  ALZ  guidance). Should you set multiple entries, make sure they are entered as single string with values separated by comma.   Example:
-    >
-    > ```json
-    > "ALZMonitorActionGroupEmail": {
-    >     "value": [
-    >         "action1@contoso.com",
-    >         "action2@contoso.com"
-    >     ]
-    > },
-    >
-    > "ALZArmRoleId": {
-    >     "value": [
-    >         "Owner",
-    >         "Contributor"
-    >     ]
-    > },
-    > "ALZWebhookServiceUri": {
-    >     "value": [
-    >         "https://webookURI1.webook.com",
-    >         "http://webookURI2.webook.com"
-    >     ]
-    > }
-    > ```
-
-  To disable initiative assignments, set the value of any of the following parameters to **"No"**: *```enableAMBAConnectivity```*, *```enableAMBAIdentity```*, *```enableAMBAManagement```*, *```enableAMBAServiceHealth```*, *```enableAMBANotificationAssets```*, *```enableAMBAHybridVM```*, *```enableAMBAKeyManagement```*, *```enableAMBALoadBalancing```*, *```enableAMBANetworkChanges```*, *```enableAMBARecoveryServices```*, *```enableAMBAStorage```*, *```enableAMBAVM```*, or *```enableAMBAWeb```*.
-
-{{% /tab %}}
-
-{{< /tabs >}}
-
-### 2. Example Parameter file
+### Sample Parameter file
 
 {{< tabs groupid="Deploy_SH_Param2" >}}
 
@@ -523,7 +252,283 @@ The parameter file shown below has been truncated for brevity, compared to the s
 
 {{< /tabs >}}
 
-### 3. Configuring variables for deployment
+### Parameter configuration
+
+{{< tabs groupid="Deploy_SH_Param1" >}}
+
+{{% tab title="Management Group (hierarchy or single)" %}}
+
+To begin, download the appropriate parameter file for the version of AMBA-ALZ you are deploying.
+
+  > [!note]
+  > Forking or cloning the repository isn’t required for the deployment, unless you have customized the policies as described in [How to modify individual policies](../Introduction-to-deploying-the-ALZ-Pattern#how-to-modify-individual-policies)
+
+- [alzArm.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/2026-06-03/patterns/alz/alzArm.param.json) aligned to the latest release
+- [alzArm.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/main/patterns/alz/alzArm.param.json) aligned to the main branch
+
+The following changes apply to all scenarios, whether you are aligned or unaligned with ALZ or have a single management group.
+
+- Change the value of the following parameters at the beginning of the parameter file according to the instructions below:
+
+  > [!note]
+  > While it's technically possible to not add any notification information (no email, no ARM Role, no Logic App, etc.) it is recommended to configure at least one option.
+
+  - Change the value of *```enterpriseScaleCompanyPrefix```* to the management group where you wish to deploy the policies and the initiatives. This is usually the so called "pseudo root management group", for example, in [ALZ terminology](https://learn.microsoft.com/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org-management-groups), this would be the so called "Intermediate Root Management Group" (directly beneath the "Tenant Root Group").
+  - Change the value of *```bringYourownUserAssignedManagedIdentity```* to **Yes** if you have an existing user assigned managed identity with the ***Monitoring Reader*** role assigned at the pseudo root management group level or leave it to **No** if you would like to create a new one with the proper rights as part of the deployment process.
+  - Change the value of *```bringYourownUserAssignedManagedIdentityResourceId```*. If you set the *```bringYourownUserAssignedManagedIdentity```* parameter to **Yes**, insert the resource ID of your user assigned managed identity. If you left it with the default value of **No**, leave the value blank.
+  - Change the value of *```userAssignedManagedIdentityName```* to a name of your preference. This parameter is used only if the *```bringYourownUserAssignedManagedIdentity```* has been set to **No**.
+  - Change the value of *```managementSubscriptionId```*. If you set the *```bringYourownUserAssignedManagedIdentity```* parameter to **No**, enter the subscriptionId of the management subscription, otherwise leave the default value.
+  - Change the value of *```ALZMonitorResourceGroupName```* to the name of the resource group where the activity logs, resource health alerts, actions groups and alert processing rules will be deployed in.
+  - Change the value of *```ALZMonitorResourceGroupTags```* to specify the tags to be added to said resource group.
+  - Change the value of *```ALZMonitorResourceGroupLocation```* to specify the location for said resource group.
+  - Update the *```ALZMonitorActionGroupEmail```* parameter with the email address(es) for alert notifications (including Service Health alerts). Leave it blank if no email notification is required or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)).
+  - Set the *```ALZLogicappResourceId```* parameter to the Logic App resource ID to be used for alert actions (including Service Health alerts). Leave it blank if no Logic App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Logic App resource ID, navigate to the resource, in the ***Overview*** panel click on ***JSON View*** and copy the value of the Resource ID field.
+
+    ![Logic App JSON View](../../../media/LogicApp_ResourceID_1.png)
+
+    ![Logic App Resource ID](../../../media/LogicApp_ResourceID_2.png)
+
+  - Update the *```ALZLogicappCallbackUrl```* parameter with the callback URL of the Logic App to be used for alert actions (including Service Health alerts). Leave it blank if no Logic App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the callback URL, use the [***Get-AzLogicAppTriggerCallbackUrl***](https://learn.microsoft.com/en-us/powershell/module/az.logicapp/get-azlogicapptriggercallbackurl) PowerShell command or navigate to the Logic App in the Azure portal, go to ***Logic App Designer***, expand the trigger activity (*When an HTTP request is received*), and copy the URL using the copy icon.
+
+    ![Get Logic app callback url](../../../media/AMBA-LogicAppCallbackUrl.png)
+
+  - Update the value of `_ALZArmRoleId_` to specify the Azure Resource Manager Role name(s) that should receive notifications for the alerts, including Service Health alerts. If no notifications are required for any Azure Resource Manager Role, or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)) leave this value blank.
+
+    Azure only supports the following ***built-in*** roles for Azure Resource Manager Role notification:
+
+    | Role Name | Role GUID |
+    | --------- | --------- |
+    | Owner | 8e3af657-a8ff-443c-a75c-2fe8c4bcb635 |
+    | Contributor | b24988ac-6180-42a0-ab88-20f7382dd24c |
+    | Reader | acdd72a7-3385-48ef-bd42-f606fba81ae7 |
+    | Monitoring Contributor | 749f88d5-cbae-40b8-bcfc-e573ddc772fa |
+    | Monitoring Reader | 43d0d8ad-25c7-4714-9337-8ba259a9fe05 |
+
+  - Update the value of *```ALZEventHubResourceId```* to specify the Event Hubs that will be used for alert actions, including Service Health alerts. Leave it blank if no Event Hubs is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Event Hubs resource ID, navigate to the resource, in the search box type ***Event Hubs***, click ***Event Hubs***, select the event hub of your interest and in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
+
+    ![Event Hub Namespace ](../../../media/EventHub_ResourceID_1.png)
+
+    ![Event Hub JSON View](../../../media/EventHub_ResourceID_2.png)
+
+    ![Event Hub Resource ID](../../../media/EventHub_ResourceID_3.png)
+
+  - Update the *```ALZWebhookServiceUri```* parameter with the URI(s) of the Webhooks to be used for alert actions, including Service Health alerts. Leave it blank if no Webhooks are used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)).
+  - Update the *```ALZFunctionResourceId```* parameter with the resource ID of the Function App to be used for alert actions, including Service Health alerts. Leave it blank if no Function App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Function App resource ID, navigate to the resource, in the ***Overview*** panel click on ***JSON View*** and copy the value of the Resource ID field.
+
+    ![Function App JSON View](../../../media/FunctionApp_ResourceID_1.png)
+
+    ![Funtion App Resource ID](../../../media/FunctionApp_ResourceID_2.png)
+
+  - Update the *```ALZFunctionTriggerUrl```* parameter with the trigger URL of the Function App to be used for alert actions, including Service Health alerts. Leave it blank if no Function App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Function App trigger URL with the corresponding code, navigate to the HTTP-triggered functions in the Azure portal, go to ***Code + Test***, select **Get function URL** from the top menu, and copy the value in the URL field using the copy icon.
+
+    ![Get function URL](../../../media/AMBA-FunctionAppTriggerUrl.png)
+
+  - Update the *```ALZAlertSeverity```* parameter with the different severity level to be used for alert actions, including Service Health alerts. Leave the default values to notify on every severity level.
+
+    > [!note]
+    > Activity Log alerts can only be configured with ***Sev4*** which translates to ***Verbose***. No other severities are allowed. Consider this when changing the default value of the ALZAlertSeverity parameter.
+
+  - Update the *```BYOActionGroup```* parameter with resource ID of your selected action group to be used for alert actions, including Service Health alerts. Leave it blank to use AMBA-ALZ created action groups. To retrieve the Action Group resource ID, navigate to the ***Monitor*** page, click on ***Action groups***, click on the identified action group, in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
+
+    ![Action groups](../../../media/ActionGroup_ResourceID_1.png)
+
+    ![Selected action group](../../../media/ActionGroup_ResourceID_2.png)
+
+    ![Action Group JSON View ID](../../../media/ActionGroup_ResourceID_3.png)
+
+    ![Action Group Resource ID](../../../media/ActionGroup_ResourceID_4.png)
+
+  - Update the *```BYOAlertProcessingRule```* parameter with the trigger URL of the Function App to be used for alert actions, including Service Health alerts. Leave it blank to use AMBA-ALZ created alert processing rules. To retrieve the Alert Processing Rule resource ID, navigate to the ***Monitor*** page, click on ***Alert Processing Rule***, click on the identified action group, in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
+
+    ![Alert Processing Rules](../../../media/AlertProcessingRule_ResourceID_1.png)
+
+    ![Selected alert processing rule](../../../media/AlertProcessingRule_ResourceID_2.png)
+
+    ![Alert Processing Rule JSON View ID](../../../media/AlertProcessingRule_ResourceID_3.png)
+
+    ![Alert Processing Rule Resource ID](../../../media/AlertProcessingRule_ResourceID_4.png)
+
+    > [!note]
+    > It is possible use multiple email addresses, as well as multiple Arm Roles, Webhooks or Event Hubs (not recommended as per  ALZ guidance). Should you set multiple entries, make sure they are entered as single string with values separated by comma.  Example:
+    >
+    > ```json
+    > "ALZMonitorActionGroupEmail": {
+    >     "value": [
+    >          "action1@contoso.com",
+    >          "action2@contoso.com"
+    >      ]
+    > },
+    >
+    > "ALZArmRoleId": {
+    >      "value": [
+    >          "Owner",
+    >          "Contributor"
+    >      ]
+    > },
+    > "ALZWebhookServiceUri": {
+    >      "value": [
+    >          "https://webookURI1.webook.com",
+    >          "http://webookURI2.webook.com"
+    >      ]
+    > }
+    > ```
+
+  To disable initiative assignments, set the value of any of the following parameters to **"No"**: *```enableAMBAConnectivity```*, *```enableAMBAIdentity```*, *```enableAMBAManagement```*, *```enableAMBAServiceHealth```*, *```enableAMBANotificationAssets```*, *```enableAMBAHybridVM```*, *```enableAMBAKeyManagement```*, *```enableAMBALoadBalancing```*, *```enableAMBANetworkChanges```*, *```enableAMBARecoveryServices```*, *```enableAMBAStorage```*, *```enableAMBAVM```*, or *```enableAMBAWeb```*.
+
+#### If you are aligned to ALZ
+
+- Change the value of *```platformManagementGroup```* to the management group ID for Platform.
+- Change the value of *```IdentityManagementGroup```* to the management group ID for Identity.
+- Change the value of *```managementManagementGroup```* to the management group ID for Management.
+- Change the value of *```connectivityManagementGroup```* to the management group ID for Connectivity.
+- Change the value of *```LandingZoneManagementGroup```* to the management group ID for Landing Zones.
+
+#### If you are unaligned to ALZ
+
+- Change the value of *```platformManagementGroup```* to the management group ID for Platform. The same management group ID may be repeated.
+- Change the value of *```IdentityManagementGroup```* to the management group ID for Identity. The same management group ID may be repeated.
+- Change the value of *```IdentityManagementGroup```* to the management group ID for Identity. The same management group ID may be repeated.
+- Change the value of *```managementManagementGroup```* to the management group ID for Management. The same management group ID may be repeated.
+- Change the value of *```connectivityManagementGroup```* to the management group ID for Connectivity. The same management group ID may be repeated.
+- Change the value of *```LandingZoneManagementGroup```* to the management group ID for Landing Zones. The same management group ID may be repeated.
+
+> [!note]
+> For ease of deployment and maintenance we have kept the same variables. For example, if you combined Identity, Management and Connectivity into one management group you should configure the variables *```identityManagementGroup```*, *```managementManagementGroup```* , *```connectivityManagementGroup```* and *```LZManagementGroup```* with the same management group id.
+
+#### If you have a single management group
+
+- Change the value of *```platformManagementGroup```* to the pseudo root management group ID, also called the "Intermediate Root Management Group".
+- Change the value of *```IdentityManagementGroup```* to the pseudo root management group ID, also called the "Intermediate Root Management Group".
+- Change the value of *```managementManagementGroup```* to the pseudo root management group ID, also called the "Intermediate Root Management Group".
+- Change the value of *```connectivityManagementGroup```* to the pseudo root management group ID, also called the "Intermediate Root Management Group".
+- Change the value of *```LandingZoneManagementGroup```* to the pseudo root management group ID, also called the "Intermediate Root Management Group".
+
+> [!note]
+> For ease of deployment and maintenance we have kept the same variables. Configure the variables *```enterpriseScaleCompanyPrefix```*, *```platformManagementGroup```*, *```identityManagementGroup```*, *```managementManagementGroup```*, *```connectivityManagementGroup```* and *```LZManagementGroup```* with the pseudo root management group ID.
+
+{{% /tab %}}
+
+{{% tab title="Cloud Solution Provider (CSP) or Azure Lighthouse" %}}
+
+To begin, download the appropriate parameter file for the version of AMBA-ALZ you are deploying.
+
+  > [!note]
+  > Forking or cloning the repository isn’t required for the deployment, unless you have customized the policies as described in [How to modify individual policies](../Introduction-to-deploying-the-ALZ-Pattern#how-to-modify-individual-policies)
+
+- [alzArm4Subs.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/2026-06-03/patterns/alz4Subs/alzArm4Subs.param.json) aligned to the latest release
+- [alzArm4Subs.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/main/patterns/alz4Subs/alzArm4Subs.param.json) aligned to the main branch
+
+Change the value of the following parameters at the beginning of the parameter file according to the instructions below:
+
+> [!note]
+> While it's technically possible to not add any notification information (no email, no ARM Role, no Logic App, etc.) it is recommended to configure at least one option.
+
+- Change the value of *```bringYourownUserAssignedManagedIdentity```* to **Yes** if you have an existing user assigned managed identity with the ***Monitoring Reader*** role assigned at the pseudo root management group level or leave it to **No** if you would like to create a new one with the proper rights as part of the deployment process.
+- Change the value of *```bringYourownUserAssignedManagedIdentityResourceId```*. If you set the *```bringYourownUserAssignedManagedIdentity```* parameter to **Yes**, insert the resource ID of your user assigned managed identity. If you left it with the default value of **No**, leave the value blank.
+- Change the value of *```userAssignedManagedIdentityName```* to a name of your preference. This parameter is used only if the *```bringYourownUserAssignedManagedIdentity```* has been set to **No**.
+- Change the value of *```topLevelSubscriptionId```*to the subscription ID where AMBA-ALZ is being deployed.
+- Change the value of *```ALZMonitorResourceGroupName```* to the name of the resource group where the activity logs, resource health alerts, actions groups and alert processing rules will be deployed in.
+- Change the value of *```ALZMonitorResourceGroupTags```* to specify the tags to be added to said resource group.
+- Change the value of *```ALZMonitorResourceGroupLocation```* to specify the location for said resource group.
+- Update the *```ALZMonitorActionGroupEmail```* parameter with the email address(es) for alert notifications (including Service Health alerts). Leave it blank if no email notification is required or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)).
+- Set the *```ALZLogicappResourceId```* parameter to the Logic App resource ID to be used for alert actions (including Service Health alerts). Leave it blank if no Logic App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Logic App resource ID, navigate to the resource, in the ***Overview*** panel click on ***JSON View*** and copy the value of the Resource ID field.
+
+  ![Logic App JSON View](../../../media/LogicApp_ResourceID_1.png)
+
+  ![Logic App Resource ID](../../../media/LogicApp_ResourceID_2.png)
+
+- Update the *```ALZLogicappCallbackUrl```* parameter with the callback URL of the Logic App to be used for alert actions (including Service Health alerts). Leave it blank if no Logic App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the callback URL, use the [***Get-AzLogicAppTriggerCallbackUrl***](https://learn.microsoft.com/en-us/powershell/module/az.logicapp/get-azlogicapptriggercallbackurl) PowerShell command or navigate to the Logic App in the Azure portal, go to ***Logic App Designer***, expand the trigger activity (*When an HTTP request is received*), and copy the URL using the copy icon.
+
+  ![Get Logic app callback url](../../../media/AMBA-LogicAppCallbackUrl.png)
+
+- Update the value of `_ALZArmRoleId_` to specify the Azure Resource Manager Role name(s) that should receive notifications for the alerts, including Service Health alerts. If no notifications are required for any Azure Resource Manager Role, or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)) leave this value blank.
+
+  Azure only supports the following ***built-in*** roles for Azure Resource Manager Role notification:
+
+  | Role Name | Role GUID |
+  | --------- | --------- |
+  | Owner | 8e3af657-a8ff-443c-a75c-2fe8c4bcb635 |
+  | Contributor | b24988ac-6180-42a0-ab88-20f7382dd24c |
+  | Reader | acdd72a7-3385-48ef-bd42-f606fba81ae7 |
+  | Monitoring Contributor | 749f88d5-cbae-40b8-bcfc-e573ddc772fa |
+  | Monitoring Reader | 43d0d8ad-25c7-4714-9337-8ba259a9fe05 |
+
+- Update the value of *```ALZEventHubResourceId```* to specify the Event Hubs that will be used for alert actions, including Service Health alerts. Leave it blank if no Event Hubs is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Event Hubs resource ID, navigate to the resource, in the search box type ***Event Hubs***, click ***Event Hubs***, select the event hub of your interest and in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
+
+  ![Event Hub Namespace ](../../../media/EventHub_ResourceID_1.png)
+
+  ![Event Hub JSON View](../../../media/EventHub_ResourceID_2.png)
+
+  ![Event Hub Resource ID](../../../media/EventHub_ResourceID_3.png)
+
+- Update the *```ALZWebhookServiceUri```* parameter with the URI(s) of the Webhooks to be used for alert actions, including Service Health alerts. Leave it blank if no Webhooks are used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)).
+- Update the *```ALZFunctionResourceId```* parameter with the resource ID of the Function App to be used for alert actions, including Service Health alerts. Leave it blank if no Function App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Function App resource ID, navigate to the resource, in the ***Overview*** panel click on ***JSON View*** and copy the value of the Resource ID field.
+
+  ![Function App JSON View](../../../media/FunctionApp_ResourceID_1.png)
+
+  ![Funtion App Resource ID](../../../media/FunctionApp_ResourceID_2.png)
+
+- Update the *```ALZFunctionTriggerUrl```* parameter with the trigger URL of the Function App to be used for alert actions, including Service Health alerts. Leave it blank if no Function App is used or if existing customer-owned action group(s) should be used (see [Bring Your Own Notifications](../../Bring-your-own-Notifications)). To retrieve the Function App trigger URL with the corresponding code, navigate to the HTTP-triggered functions in the Azure portal, go to ***Code + Test***, select **Get function URL** from the top menu, and copy the value in the URL field using the copy icon.
+
+  ![Get function URL](../../../media/AMBA-FunctionAppTriggerUrl.png)
+
+- Update the *```ALZAlertSeverity```* parameter with the different severity level to be used for alert actions, including Service Health alerts. Leave the default values to notify on every severity level.
+
+  > [!note]
+  > Activity Log alerts can only be configured with ***Sev4*** which translates to ***Verbose***. No other severities are allowed. Consider this when changing the default value of the ALZAlertSeverity parameter.
+
+- Update the *```BYOActionGroup```* parameter with resource ID of your selected action group to be used for alert actions, including Service Health alerts. Leave it blank to use AMBA-ALZ created action groups. To retrieve the Action Group resource ID, navigate to the ***Monitor*** page, click on ***Action groups***, click on the identified action group, in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
+
+  ![Action groups](../../../media/ActionGroup_ResourceID_1.png)
+
+  ![Selected action group](../../../media/ActionGroup_ResourceID_2.png)
+
+  ![Action Group JSON View ID](../../../media/ActionGroup_ResourceID_3.png)
+
+  ![Action Group Resource ID](../../../media/ActionGroup_ResourceID_4.png)
+
+- Update the *```BYOAlertProcessingRule```* parameter with the trigger URL of the Function App to be used for alert actions, including Service Health alerts. Leave it blank to use AMBA-ALZ created alert processing rules. To retrieve the Alert Processing Rule resource ID, navigate to the ***Monitor*** page, click on ***Alert Processing Rule***, click on the identified action group, in the ***Overview*** page that will load click on ***JSON View*** and copy the value of the Resource ID field.
+
+  ![Alert Processing Rules](../../../media/AlertProcessingRule_ResourceID_1.png)
+
+  ![Selected alert processing rule](../../../media/AlertProcessingRule_ResourceID_2.png)
+
+  ![Alert Processing Rule JSON View ID](../../../media/AlertProcessingRule_ResourceID_3.png)
+
+  ![Alert Processing Rule Resource ID](../../../media/AlertProcessingRule_ResourceID_4.png)
+
+    > [!note]
+    > It is possible use multiple email addresses, as well as multiple Arm Roles, Webhooks or Event Hubs (not recommended as per  ALZ  guidance). Should you set multiple entries, make sure they are entered as single string with values separated by comma.   Example:
+    >
+    > ```json
+    > "ALZMonitorActionGroupEmail": {
+    >     "value": [
+    >         "action1@contoso.com",
+    >         "action2@contoso.com"
+    >     ]
+    > },
+    >
+    > "ALZArmRoleId": {
+    >     "value": [
+    >         "Owner",
+    >         "Contributor"
+    >     ]
+    > },
+    > "ALZWebhookServiceUri": {
+    >     "value": [
+    >         "https://webookURI1.webook.com",
+    >         "http://webookURI2.webook.com"
+    >     ]
+    > }
+    > ```
+
+  To disable initiative assignments, set the value of any of the following parameters to **"No"**: *```enableAMBAConnectivity```*, *```enableAMBAIdentity```*, *```enableAMBAManagement```*, *```enableAMBAServiceHealth```*, *```enableAMBANotificationAssets```*, *```enableAMBAHybridVM```*, *```enableAMBAKeyManagement```*, *```enableAMBALoadBalancing```*, *```enableAMBANetworkChanges```*, *```enableAMBARecoveryServices```*, *```enableAMBAStorage```*, *```enableAMBAVM```*, or *```enableAMBAWeb```*.
+
+{{% /tab %}}
+
+{{< /tabs >}}
+
+### Configuring variables for deployment
 
 {{< tabs groupid="Deploy_SH_VAriables" >}}
 
@@ -569,7 +574,7 @@ targetSubscription="The pseudo root management group ID parenting the Platform a
 
 {{< /tabs >}}
 
-### 4. Deploying AMBA-ALZ
+### Deploying AMBA-ALZ
 
 {{< tabs groupid="Deploy_SH_Deploy" >}}
 

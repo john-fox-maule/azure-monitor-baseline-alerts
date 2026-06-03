@@ -5,13 +5,19 @@ weight: 75
 
 ### On this page
 
+> [Prerequisites](#prerequisites) </br>
+> [Choose one example of deployment](#choose-one-example-of-deployment) </br>
 > [Example of deploying AMBA-ALZ](#example-of-deploying-amba-alz) </br>
 > [Example of deploying a Custom Architecture](#example-of-deploying-a-custom-architecture) </br>
 > [Example of deploying with Custom Policy Assignments](#example-of-deploying-with-custom-policy-assignments) </br>
 > [Data Collection](#data-collection) </br>
 > [Next Steps](#next-steps) </br>
 
-## Choose one of the examples
+## Prerequisites
+
+Deploying AMBA-ALZ requires some prerequisites and configuration to be completed upfront for both _**Management Group (hierarchy or single)**_ and _**Cloud Solution Provider (CSP) or Azure Lighthouse**_. Ensure all the necessary prerequisites, listed for the respective section in the [Prerequisites](./Introduction-to-deploying-the-ALZ-Pattern#prerequisites) page are in place.
+
+## Choose one example of deployment
 
 - **Example of deploying AMBA-ALZ**: This example demonstrates how to deploy the AMBA-ALZ pattern using an existing management group hierarchy with default naming as used in the [ALZ Architecture Definition](https://raw.githubusercontent.com/Azure/Azure-Landing-Zones-Library/refs/heads/main/platform/alz/architecture_definitions/alz.alz_architecture_definition.json).
 - **Example of deploying a Custom Architecture**: This example demonstrates how to deploy the AMBA-ALZ pattern using an existing custom management group hierarchy.

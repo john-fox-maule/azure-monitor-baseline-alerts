@@ -40,7 +40,14 @@ Alerts, action groups, and alert processing rules are created as follows:
 1. A Microsoft Entra ID Tenant.
 2. An ALZ Management group hierarchy deployed as outlined in the [Azure landing zone design areas and conceptual architecture](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-areas) documentation.
 3. At least one subscription for deploying alerts through policies.
-4. A Deployment Identity with `Owner` permissions to the pseudo root management group. This permission is necessary for the Service Principal Account to create role-based access control assignments.
+4. A user or security principal executing the deployment with necessary permissions to the pseudo root management group. These permissions are necessary for the Service Principal Account to create role-based access control assignments. Instead of assigning the `Owner` role, a least-privilege set of roles can be used, including:
+
+   - Managed Identity Contributor
+   - Monitoring Policy Contributor
+   - User Access Administrator (with condition to assign all user roles except admin roles Owner, UAA, RBAC)
+
+    </br>
+
 5. If deploying manually via Azure CLI or PowerShell, ensure [Bicep](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep) is installed and configured. Refer to the configuration guides for [Azure CLI](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli) and [PowerShell](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-powershell).
 6. The following Azure resource providers must be registered on all subscriptions in scope for the policies to function correctly:
 
@@ -62,7 +69,14 @@ Alerts, action groups, and alert processing rules are created as follows:
 
 1. A Microsoft Entra ID Tenant.
 2. At least one active Azure subscription for deploying alerts through policies.
-3. A Deployment Identity with `Owner` permissions on the given subscription. This permission is necessary for the Service Principal Account to create role-based access control assignments.
+3. A user or security principal executing the deployment with necessary permissions to the given subscription. These permissions are necessary for the Service Principal Account to create role-based access control assignments. Instead of assigning the `Owner` role, a least-privilege set of roles can be used, including:
+
+   - Managed Identity Contributor
+   - Monitoring Policy Contributor
+   - User Access Administrator (with condition to assign all user roles except admin roles Owner, UAA, RBAC)
+
+    </br>
+
 4. If deploying manually via Azure CLI or PowerShell, ensure [Bicep](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep) is installed and configured. Refer to the configuration guides for [Azure CLI](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli) and [PowerShell](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-powershell).
 5. The following Azure resource providers must be registered on all subscriptions in scope for the policies to function correctly:
 

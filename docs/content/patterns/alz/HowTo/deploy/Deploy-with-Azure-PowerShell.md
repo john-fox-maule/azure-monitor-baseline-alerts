@@ -5,10 +5,11 @@ weight: 50
 
 ### In this page
 
-> [Parameter Configuration](#1-parameter-configuration) </br>
-> [Sample Parameter File](#2-sample-parameter-file) </br>
-> [Configuring Variables for Deployment](#3-configuring-variables-for-deployment) </br>
-> [Deploy Policy Definitions, Initiatives, and Policy Assignments with Default Settings](#4-deploy-policy-definitions-initiatives-and-policy-assignments-with-default-settings) </br>
+> [Prerequisites](#prerequisites) </br>
+> [Sample Parameter File](#sample-parameter-file) </br>
+> [Parameter Configuration](#parameter-configuration) </br>
+> [Configuring Variables for Deployment](#configuring-variables-for-deployment) </br>
+> [Deploying AMBA-ALZ](#deploying-amba-alz) </br>
 > [Next Steps](#next-steps) </br>
 
 </br>
@@ -16,25 +17,11 @@ weight: 50
 > [!warning]
 > Updating from the _**preview**_ version is not supported. If you deployed the _**preview**_ version, please follow the steps in [Transitioning from Preview to General Availability (GA)](../../../HowTo/UpdateToNewReleases/Moving-from-preview-to-GA) before proceeding.
 
-## 1. Parameter Configuration
+## Prerequisites
 
-{{< tabs groupid="Deploy_PSH_Param1" >}}
+Deploying AMBA-ALZ requires some prerequisites and configuration to be completed upfront for both _**Management Group (hierarchy or single)**_ and _**Cloud Solution Provider (CSP) or Azure Lighthouse**_. Ensure all the necessary prerequisites, listed for the respective section in the [Prerequisites](./Introduction-to-deploying-the-ALZ-Pattern#prerequisites) page are in place.
 
-{{% tab title="Management Group (hierarchy or single)" %}}
-
-{{% include "parameterConfiguration_1" %}}
-
-{{% /tab %}}
-
-{{% tab title="Cloud Solution Provider (CSP) or Azure Lighthouse" %}}
-
-{{% include "parameterConfiguration_Subs_1" %}}
-
-{{% /tab %}}
-
-{{< /tabs >}}
-
-## 2. Sample Parameter File
+## Sample Parameter File
 
 {{< tabs groupid="Deploy_PSH_Param2" >}}
 
@@ -52,7 +39,25 @@ weight: 50
 
 {{< /tabs >}}
 
-## 3. Configuring Variables for Deployment
+## Parameter Configuration
+
+{{< tabs groupid="Deploy_PSH_Param1" >}}
+
+{{% tab title="Management Group (hierarchy or single)" %}}
+
+{{% include "parameterConfiguration_1" %}}
+
+{{% /tab %}}
+
+{{% tab title="Cloud Solution Provider (CSP) or Azure Lighthouse" %}}
+
+{{% include "parameterConfiguration_Subs_1" %}}
+
+{{% /tab %}}
+
+{{< /tabs >}}
+
+## Configuring Variables for Deployment
 
 {{< tabs groupid="Deploy_PSH_Variables" >}}
 
@@ -104,7 +109,7 @@ $pseudoRootManagementGroup = "The pseudo root management group ID parenting the 
 
 {{< /tabs >}}
 
-## 4. Deploy Policy Definitions, Initiatives, and Policy Assignments with Default Settings
+## Deploying AMBA-ALZ
 
 {{< tabs groupid="Deploy_PSH_Deploy" >}}
 
