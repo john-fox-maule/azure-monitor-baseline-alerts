@@ -263,7 +263,7 @@ To begin, download the appropriate parameter file for the version of AMBA-ALZ yo
   > [!note]
   > Forking or cloning the repository isn’t required for the deployment, unless you have customized the policies as described in [How to modify individual policies](../Introduction-to-deploying-the-ALZ-Pattern#how-to-modify-individual-policies)
 
-- [alzArm.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/2026-03-06/patterns/alz/alzArm.param.json) aligned to the latest release
+- [alzArm.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/2026-06-03/patterns/alz/alzArm.param.json) aligned to the latest release
 - [alzArm.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/main/patterns/alz/alzArm.param.json) aligned to the main branch
 
 The following changes apply to all scenarios, whether you are aligned or unaligned with ALZ or have a single management group.
@@ -415,7 +415,7 @@ To begin, download the appropriate parameter file for the version of AMBA-ALZ yo
   > [!note]
   > Forking or cloning the repository isn’t required for the deployment, unless you have customized the policies as described in [How to modify individual policies](../Introduction-to-deploying-the-ALZ-Pattern#how-to-modify-individual-policies)
 
-- [alzArm4Subs.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/2026-03-06/patterns/alz4Subs/alzArm4Subs.param.json) aligned to the latest release
+- [alzArm4Subs.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/2026-06-03/patterns/alz4Subs/alzArm4Subs.param.json) aligned to the latest release
 - [alzArm4Subs.param.json](https://github.com/azure/azure-monitor-baseline-alerts/blob/main/patterns/alz4Subs/alzArm4Subs.param.json) aligned to the main branch
 
 Change the value of the following parameters at the beginning of the parameter file according to the instructions below:
