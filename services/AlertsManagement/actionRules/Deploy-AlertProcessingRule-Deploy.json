@@ -395,7 +395,7 @@
                       "input": {
                         "name": "[[concat('AlzMail-', indexOf(parameters('ALZMonitorActionGroupEmail'), parameters('ALZMonitorActionGroupEmail')[copyIndex('varEmailReceivers')]))]",
                         "emailAddress": "[[trim(parameters('ALZMonitorActionGroupEmail')[copyIndex('varEmailReceivers')])]",
-                        "useCommonAlertSchema": false
+                        "useCommonAlertSchema": true
                       }
                     },
                     {
